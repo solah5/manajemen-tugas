@@ -164,7 +164,7 @@ const addNoteHandler = async (request, h) => {
   const userId = request.userId;
 
   const id = nanoid(16);
-  const createdAt = new Date().toISOString();
+  const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
   const updatedAt = createdAt;
 
   try {
@@ -245,7 +245,7 @@ const editNoteByIdHandler = async (request, h) => {
   const { id } = request.params;
   const { title, tags, body, status, deadline } = request.payload;
   const userId = request.userId;
-  const updatedAt = new Date().toISOString();
+  const updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   try {
     const [result] = await pool.execute(
