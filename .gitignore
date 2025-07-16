@@ -1,0 +1,15 @@
+# Folder dependensi. Jangan pernah upload ini ke GitHub.
+# Bisa dibuat ulang kapan saja dengan `npm install`.
+node_modules
+
+# File environment variables. Berisi kunci rahasia dan password.
+# SANGAT PENTING untuk diabaikan.
+.env
+
+# File log
+*.log
+npm-debug.log*
+
+# File sistem operasi
+.DS_Store
+Thumbs.db

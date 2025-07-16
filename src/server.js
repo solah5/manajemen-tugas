@@ -1,10 +1,13 @@
+require('dotenv').config(); 
 const Hapi = require("@hapi/hapi");
 const routes = require("./routes");
 
 const init = async () => {
   const server = Hapi.server({
-    port: 5000,
-    host: "localhost",
+    // --- UBAH BAGIAN INI ---
+    port: process.env.PORT || 5000,
+    host: "0.0.0.0", // <-- Penting untuk environment seperti Railway
+    // -----------------------
     routes: {
       cors: {
         origin: ["*"],
