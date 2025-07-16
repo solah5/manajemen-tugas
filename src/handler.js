@@ -4,6 +4,13 @@ const pool = require("./database"); // Koneksi database MySQL
 const bcrypt = require("bcrypt"); // Untuk hash dan verifikasi password
 const jwt = require("jsonwebtoken"); // Untuk membuat dan memverifikasi token JWT
 
+console.log('====================================');
+console.log('MEMERIKSA ENVIRONMENT VARIABLES...');
+console.log('Nilai MYSQLHOST:', process.env.MYSQLHOST);
+console.log('Nilai MYSQLUSER:', process.env.MYSQLUSER);
+console.log('Nilai JWT_SECRET:', process.env.JWT_SECRET);
+console.log('====================================');
+
 const SECRET_KEY = process.env.JWT_SECRET; // Kunci rahasia untuk JWT
 
 // ===============================
