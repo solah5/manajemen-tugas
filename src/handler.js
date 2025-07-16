@@ -1,17 +1,11 @@
 // Import dependensi yang diperlukan
-const { nanoid } = require("nanoid"); // Untuk membuat ID unik
-const pool = require("./database"); // Koneksi database MySQL
-const bcrypt = require("bcrypt"); // Untuk hash dan verifikasi password
-const jwt = require("jsonwebtoken"); // Untuk membuat dan memverifikasi token JWT
+const { nanoid } = require("nanoid");
+const pool = require("./database");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-console.log('====================================');
-console.log('MEMERIKSA ENVIRONMENT VARIABLES...');
-console.log('Nilai MYSQLHOST:', process.env.MYSQLHOST);
-console.log('Nilai MYSQLUSER:', process.env.MYSQLUSER);
-console.log('Nilai JWT_SECRET:', process.env.JWT_SECRET);
-console.log('====================================');
-
-const SECRET_KEY = process.env.JWT_SECRET; // Kunci rahasia untuk JWT
+// Baca Kunci rahasia untuk JWT dari Environment Variable
+const SECRET_KEY = process.env.JWT_SECRET;
 
 // ===============================
 // Fungsi Pembantu
@@ -47,6 +41,7 @@ const registerHandler = async (request, h) => {
       })
       .code(201);
   } catch (error) {
+    console.error("Register handler error:", error); // <-- LOGGING DITAMBAHKAN
     if (error.code === "ER_DUP_ENTRY") {
       return h
         .response({
@@ -103,6 +98,7 @@ const loginHandler = async (request, h) => {
       data: { token, role: user.role },
     });
   } catch (error) {
+    console.error("Login handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "error",
@@ -116,7 +112,6 @@ const loginHandler = async (request, h) => {
 // Middleware Autentikasi & Otorisasi
 // ===============================
 
-// Middleware untuk memverifikasi token JWT
 const authenticate = async (request, h) => {
   const authHeader = request.headers.authorization;
   if (!authHeader) {
@@ -136,6 +131,7 @@ const authenticate = async (request, h) => {
     request.userRole = decoded.role;
     return h.continue;
   } catch (error) {
+    console.error("Authentication error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -146,7 +142,6 @@ const authenticate = async (request, h) => {
   }
 };
 
-// Middleware untuk membatasi akses hanya untuk admin
 const authorizeAdmin = async (request, h) => {
   if (request.userRole !== "admin") {
     return h
@@ -164,7 +159,6 @@ const authorizeAdmin = async (request, h) => {
 // Handler untuk Operasi Catatan
 // ===============================
 
-// Menambahkan catatan baru
 const addNoteHandler = async (request, h) => {
   const { title, tags, body, status = "pending", deadline } = request.payload;
   const userId = request.userId;
@@ -187,6 +181,7 @@ const addNoteHandler = async (request, h) => {
       })
       .code(201);
   } catch (error) {
+    console.error("Add note handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -196,7 +191,6 @@ const addNoteHandler = async (request, h) => {
   }
 };
 
-// Mengambil semua catatan milik user saat ini
 const getAllNotesHandler = async (request, h) => {
   const userId = request.userId;
 
@@ -206,6 +200,7 @@ const getAllNotesHandler = async (request, h) => {
     ]);
     return { status: "success", data: { notes } };
   } catch (error) {
+    console.error("Get all notes handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -215,7 +210,6 @@ const getAllNotesHandler = async (request, h) => {
   }
 };
 
-// Mengambil catatan berdasarkan ID (hanya milik user)
 const getNotesByIdHandler = async (request, h) => {
   const { id } = request.params;
   const userId = request.userId;
@@ -237,6 +231,7 @@ const getNotesByIdHandler = async (request, h) => {
       })
       .code(404);
   } catch (error) {
+    console.error("Get note by id handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -246,7 +241,6 @@ const getNotesByIdHandler = async (request, h) => {
   }
 };
 
-// Mengedit catatan berdasarkan ID (hanya milik user)
 const editNoteByIdHandler = async (request, h) => {
   const { id } = request.params;
   const { title, tags, body, status, deadline } = request.payload;
@@ -273,6 +267,7 @@ const editNoteByIdHandler = async (request, h) => {
       })
       .code(404);
   } catch (error) {
+    console.error("Edit note handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -282,7 +277,6 @@ const editNoteByIdHandler = async (request, h) => {
   }
 };
 
-// Menghapus catatan berdasarkan ID (hanya milik user)
 const deleteNoteByIdHandler = async (request, h) => {
   const { id } = request.params;
   const userId = request.userId;
@@ -307,6 +301,7 @@ const deleteNoteByIdHandler = async (request, h) => {
       })
       .code(404);
   } catch (error) {
+    console.error("Delete note handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -320,12 +315,12 @@ const deleteNoteByIdHandler = async (request, h) => {
 // Handler untuk Admin
 // ===============================
 
-// Mengambil semua user (untuk admin)
 const getAllUsersHandler = async (request, h) => {
   try {
     const [users] = await pool.execute("SELECT id, username, role FROM users");
     return { status: "success", data: { users } };
   } catch (error) {
+    console.error("Get all users admin handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -335,7 +330,6 @@ const getAllUsersHandler = async (request, h) => {
   }
 };
 
-// Mengambil semua tugas dari semua user (untuk admin)
 const getAllTasksAdminHandler = async (request, h) => {
   try {
     const [notes] = await pool.execute(`
@@ -345,6 +339,7 @@ const getAllTasksAdminHandler = async (request, h) => {
     `);
     return { status: "success", data: { notes } };
   } catch (error) {
+    console.error("Get all tasks admin handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
@@ -354,7 +349,6 @@ const getAllTasksAdminHandler = async (request, h) => {
   }
 };
 
-// Mengambil semua tugas berdasarkan ID user (untuk admin)
 const getTasksByUserIdAdminHandler = async (request, h) => {
   const { userId } = request.params;
   try {
@@ -363,6 +357,7 @@ const getTasksByUserIdAdminHandler = async (request, h) => {
     ]);
     return { status: "success", data: { notes } };
   } catch (error) {
+    console.error("Get tasks by user id admin handler error:", error); // <-- LOGGING DITAMBAHKAN
     return h
       .response({
         status: "fail",
