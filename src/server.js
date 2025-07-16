@@ -3,7 +3,7 @@ require('dotenv').config();
 const Hapi = require("@hapi/hapi");
 const Inert = require('@hapi/inert');
 const path = require('path');
-const routes = require("./routes"); // Pastikan path ini benar
+const routes = require("./routes");
 
 const init = async () => {
   console.log('Mendefinisikan server Hapi...');
