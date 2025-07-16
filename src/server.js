@@ -9,8 +9,10 @@ const init = async () => {
     host: "0.0.0.0",
     routes: {
       cors: {
-        origin: ["*"], // Izinkan akses dari domain manapun (termasuk Netlify)
-      },
+        origin: ['*'], // Izinkan akses dari domain manapun
+        headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'], // Izinkan header penting
+        credentials: true
+      }
     },
   });
 
