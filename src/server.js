@@ -4,7 +4,6 @@ const Hapi = require("@hapi/hapi");
 const Inert = require('@hapi/inert');
 const path = require('path');
 const routes = require("./routes"); // Pastikan path ini benar
-const dbPool = require('./database'); // Panggil konfigurasi pool dari database.js
 
 const init = async () => {
   console.log('Mendefinisikan server Hapi...');
@@ -13,13 +12,15 @@ const init = async () => {
     host: "0.0.0.0",
     routes: {
       files: {
-        relativeTo: path.join(__dirname, 'frontend')
+        relativeTo: path.join(__dirname, 'frontend') 
       }
     },
   });
 
+  console.log('Mendaftarkan plugin...');
   await server.register(Inert);
 
+  console.log('Mendefinisikan rute...');
   // Route untuk landing page
   server.route({
     method: 'GET',
@@ -41,23 +42,12 @@ const init = async () => {
     }
   });
 
-  // Daftarkan rute API Anda
+  // Daftarkan rute API Anda dari file lain
   server.route(routes);
 
-  // Coba tes koneksi database SETELAH server didefinisikan
-  try {
-    console.log('Mencoba terhubung ke database...');
-    const connection = await dbPool.getConnection();
-    console.log('✅ Berhasil terhubung ke database.');
-    connection.release(); // Lepaskan koneksi setelah tes berhasil
-  } catch (dbError) {
-    console.error('❌ Gagal terhubung ke database:', dbError);
-    // Kita tidak menghentikan proses jika DB gagal, agar server tetap bisa jalan
-  }
-
-  // MULAI SERVER SEKARANG
+  // LANGSUNG MULAI SERVER
   await server.start();
-  console.log(`🚀 Server berjalan di ${server.info.uri}`);
+  console.log(`🚀 Server berhasil aktif di ${server.info.uri}`);
 };
 
 init();
