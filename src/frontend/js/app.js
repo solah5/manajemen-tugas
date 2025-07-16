@@ -98,7 +98,7 @@ createApp({
      */
     async fetchNotes() {
       try {
-        const response = await axios.get("http://localhost:5000/notes", {
+        const response = await axios.get("/notes", {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.notes = response.data.data.notes;
@@ -119,7 +119,7 @@ createApp({
      */
     async login() {
       try {
-        const response = await axios.post("http://localhost:5000/login", this.loginForm);
+        const response = await axios.post("/login", this.loginForm);
         // Simpan token dan role ke state dan localStorage
         this.token = response.data.data.token;
         this.isAdmin = response.data.data.role === 'admin';
@@ -141,7 +141,7 @@ createApp({
      */
     async register() {
       try {
-        await axios.post("http://localhost:5000/register", this.registerForm);
+        await axios.post("/register", this.registerForm);
         alert("Registrasi berhasil. Silakan login.");
         this.authTab = "login"; // Pindah ke tab login
         this.registerForm = { username: "", password: "" }; // Reset form
@@ -179,7 +179,7 @@ createApp({
      */
     async addNote() {
       try {
-        await axios.post("http://localhost:5000/notes", this.noteForm, {
+        await axios.post("/notes", this.noteForm, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.fetchNotes(); // Muat ulang data tugas
@@ -196,7 +196,7 @@ createApp({
      */
     async updateNote() {
       try {
-        await axios.put(`http://localhost:5000/notes/${this.noteForm.id}`, this.noteForm, {
+        await axios.put(`/notes/${this.noteForm.id}`, this.noteForm, {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.fetchNotes();
@@ -214,7 +214,7 @@ createApp({
     async deleteNote(id) {
       if (confirm("Apakah Anda yakin ingin menghapus tugas ini?")) {
         try {
-          await axios.delete(`http://localhost:5000/notes/${id}`, {
+          await axios.delete(`/notes/${id}`, {
             headers: { Authorization: `Bearer ${this.token}` },
           });
           this.fetchNotes(); // Muat ulang data setelah hapus
@@ -543,7 +543,7 @@ createApp({
     async fetchAllUsers() {
       if (!this.isAdmin) return; // Pemeriksaan keamanan
       try {
-        const response = await axios.get("http://localhost:5000/admin/users", {
+        const response = await axios.get("/admin/users", {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.allUsers = response.data.data.users;
@@ -560,7 +560,7 @@ createApp({
     async fetchAllTasks() {
       if (!this.isAdmin) return;
       try {
-        const response = await axios.get("http://localhost:5000/admin/tasks", {
+        const response = await axios.get("/admin/tasks", {
           headers: { Authorization: `Bearer ${this.token}` },
         });
         this.allTasks = response.data.data.notes;
