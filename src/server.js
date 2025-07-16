@@ -20,12 +20,13 @@ const init = async () => {
 
   // Route untuk landing page
   server.route({
-    method: 'GET',
-    path: '/',
-    handler: (request, h) => {
-      return h.file('landing.html');
-    }
-  });
+  method: 'GET',
+  path: '/',
+  handler: (request, h) => {
+    // Kembalikan teks biasa untuk memastikan health check lolos
+    return 'Aplikasi backend berjalan. Frontend di-load terpisah.';
+  }
+});
 
   // Route untuk file statis lain
    server.route({
