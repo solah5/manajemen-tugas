@@ -4,7 +4,7 @@ const pool = require("./database"); // Koneksi database MySQL
 const bcrypt = require("bcrypt"); // Untuk hash dan verifikasi password
 const jwt = require("jsonwebtoken"); // Untuk membuat dan memverifikasi token JWT
 
-const SECRET_KEY = "Namakamu248"; // Kunci rahasia untuk JWT
+const SECRET_KEY = "iniadalahrahasiayangSANGATpanjangdantidakbisaditebak"; // Kunci rahasia untuk JWT
 
 // ===============================
 // Fungsi Pembantu
