@@ -5,7 +5,7 @@ require('dotenv').config();
 const Hapi = require("@hapi/hapi");
 const Inert = require('@hapi/inert'); // Panggil plugin Inert
 const path = require('path');        // Panggil module 'path'
-const routes = require("./src/routes"); // Pastikan path ke routes benar
+const routes = require("./routes"); // Pastikan path ke routes benar
 
 const init = async () => {
   const server = Hapi.server({
