@@ -1,32 +1,56 @@
-require('dotenv').config(); 
+// server.js
+
+require('dotenv').config();
+
 const Hapi = require("@hapi/hapi");
-const routes = require("./routes");
+const Inert = require('@hapi/inert'); // Panggil plugin Inert
+const path = require('path');        // Panggil module 'path'
+const routes = require("./src/routes"); // Pastikan path ke routes benar
 
 const init = async () => {
   const server = Hapi.server({
-    // --- UBAH BAGIAN INI ---
     port: process.env.PORT || 5000,
-    host: "0.0.0.0", // <-- Penting untuk environment seperti Railway
-    // -----------------------
+    host: "0.0.0.0",
     routes: {
+      files: {
+        // Beritahu Hapi di mana folder frontend Anda berada
+        relativeTo: path.join(__dirname, 'frontend') 
+      },
       cors: {
         origin: ["*"],
-        headers: ["Authorization", "Content-Type"],
-        credentials: true,
       },
     },
   });
 
-  // Register routes
+  // Daftarkan plugin Inert
+  await server.register(Inert);
+
+  // Buat route utama untuk menyajikan landing.html
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+      return h.file('landing.html');
+    }
+  });
+
+  // Buat route untuk menyajikan semua file lain (CSS, JS, images)
+  server.route({
+    method: 'GET',
+    path: '/{param*}',
+    handler: {
+      directory: {
+        path: '.',
+        redirectToSlash: true,
+      }
+    }
+  });
+
+  // Daftarkan rute API Anda dari file lain
   server.route(routes);
 
   await server.start();
   console.log(`Server running on ${server.info.uri}`);
 };
-
-process.on("unhandledRejection", (err) => {
-  console.log(err);
-  process.exit(1);
-});
 
 init();
