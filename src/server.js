@@ -1,31 +1,26 @@
-// server.js
-
 require('dotenv').config();
 
 const Hapi = require("@hapi/hapi");
-const Inert = require('@hapi/inert'); // Panggil plugin Inert
-const path = require('path');        // Panggil module 'path'
-const routes = require("./routes"); // Pastikan path ke routes benar
+const Inert = require('@hapi/inert');
+const path = require('path');
+const routes = require("./routes"); // Pastikan path ini benar
+const dbPool = require('./database'); // Panggil konfigurasi pool dari database.js
 
 const init = async () => {
+  console.log('Mendefinisikan server Hapi...');
   const server = Hapi.server({
     port: process.env.PORT || 5000,
     host: "0.0.0.0",
     routes: {
       files: {
-        // Beritahu Hapi di mana folder frontend Anda berada
-        relativeTo: path.join(__dirname, 'frontend') 
-      },
-      cors: {
-        origin: ["*"],
-      },
+        relativeTo: path.join(__dirname, 'frontend')
+      }
     },
   });
 
-  // Daftarkan plugin Inert
   await server.register(Inert);
 
-  // Buat route utama untuk menyajikan landing.html
+  // Route untuk landing page
   server.route({
     method: 'GET',
     path: '/',
@@ -34,7 +29,7 @@ const init = async () => {
     }
   });
 
-  // Buat route untuk menyajikan semua file lain (CSS, JS, images)
+  // Route untuk file statis lainnya
   server.route({
     method: 'GET',
     path: '/{param*}',
@@ -46,11 +41,23 @@ const init = async () => {
     }
   });
 
-  // Daftarkan rute API Anda dari file lain
+  // Daftarkan rute API Anda
   server.route(routes);
 
+  // Coba tes koneksi database SETELAH server didefinisikan
+  try {
+    console.log('Mencoba terhubung ke database...');
+    const connection = await dbPool.getConnection();
+    console.log('✅ Berhasil terhubung ke database.');
+    connection.release(); // Lepaskan koneksi setelah tes berhasil
+  } catch (dbError) {
+    console.error('❌ Gagal terhubung ke database:', dbError);
+    // Kita tidak menghentikan proses jika DB gagal, agar server tetap bisa jalan
+  }
+
+  // MULAI SERVER SEKARANG
   await server.start();
-  console.log(`Server running on ${server.info.uri}`);
+  console.log(`🚀 Server berjalan di ${server.info.uri}`);
 };
 
 init();
